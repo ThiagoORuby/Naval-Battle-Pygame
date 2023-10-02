@@ -50,7 +50,7 @@ Follow the on-screen instructions to start playing.
 
 
 ### License
-This project is licensed under the [License Name] License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 
 
