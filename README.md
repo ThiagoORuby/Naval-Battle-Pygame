@@ -8,15 +8,15 @@ A Naval Battle Game made with python, using pygame and socket.
 
 Before you begin, ensure you have met the following requirements:
 
-Python 3.x installed. You can download it from [python.org].
+Python 3.x installed. You can download it from [python.org](python.org).
 
 ### Installation
 
 Clone the repository to your local machine:
 
 ```shell
-git clone https://github.com/yourusername/your-gamename.git
-cd your-gamename
+git clone https://github.com/ThiagoORuby/Naval-Battle-Pygame.git
+cd Naval-Battle-Pygame
 ```
 
 Create a virtual environment and activate it:
