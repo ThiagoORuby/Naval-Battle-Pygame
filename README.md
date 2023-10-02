@@ -1,0 +1,58 @@
+# Multiplayer Naval Battle Game
+
+A Naval Battle Game made with python, using pygame and socket.
+
+---
+
+### Prerequisites
+
+Before you begin, ensure you have met the following requirements:
+
+Python 3.x installed. You can download it from [python.org].
+
+### Installation
+
+Clone the repository to your local machine:
+
+```shell
+git clone https://github.com/yourusername/your-gamename.git
+cd your-gamename
+```
+
+Create a virtual environment and activate it:
+
+```shell
+python -m venv venv
+source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+```
+
+Install the required dependencies:
+
+```shell
+pip install -r requirements.txt
+```
+
+### How to Play
+
+To play the game, first run the server:
+
+```shell
+python server.py
+```
+
+And, in another terminal, run the game using the following command:
+
+```shell
+python client.py
+```
+
+Follow the on-screen instructions to start playing.
+
+
+### License
+This project is licensed under the [License Name] License - see the LICENSE file for details.
+
+
+
+
+
