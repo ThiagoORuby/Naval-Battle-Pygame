@@ -1,6 +1,6 @@
-# Multiplayer Naval Battle Game
+# Multiplayer Battleship Game
 
-A Naval Battle Game made with python, using pygame and socket.
+A Battleship game made with python, using pygame and socket.
 
 ---
 
