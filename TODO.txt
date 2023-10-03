@@ -1,7 +1,0 @@
-- Organização do código
-- Criação da função de geração de grid
-- Soundeffects no jogo OK
-- Melhoria dos gráficos
-- Input ou click? OK
-
-- correr pro abraço

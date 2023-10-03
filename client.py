@@ -2,118 +2,26 @@ import pygame
 from network import Network
 from constants import *
 from components import *
-import pickle
+from utils import *
 from math import floor
-pygame.font.init()
+import time
+
 
 pygame.init()
 win = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("Client")
 
-ship_spritesheet = pygame.image.load('assets/BattleShipSheet_final.png')
-token_spritesheet = pygame.image.load('assets/Tokens.png')
-ocean_map = pygame.image.load('assets/oceangrid_final.png')
-radar_map = pygame.image.load('assets/radargrid_final.png')
-
-row = 0
-col = 0
-h_row = SHIP_POS_Y
-h_col = SHIP_POS_X
-vertical_ships = dict()
-horizontal_ships = dict()
-for size in SHIP_SIZE:
-    sprite_v = ship_spritesheet.subsurface(
-        pygame.Rect(
-            col,
-            row,
-            TILE_SIZE,
-            TILE_SIZE*size - (size - 1)
-        )
-    )
-    sprite_h = ship_spritesheet.subsurface(
-        pygame.Rect(
-            h_col,
-            h_row,
-            TILE_SIZE*size - (size - 1),
-            TILE_SIZE
-        )
-    ) 
-    vertical_ships[size] = sprite_v
-    horizontal_ships[size] = sprite_h
-    col += (TILE_SIZE + 6)
-    h_row += (TILE_SIZE + 6)
-
-tokens = dict()
-col = 0
-for kind in SHOOT_TYPES:
-    sprite = token_spritesheet.subsurface(
-        pygame.Rect(
-            col,
-            0,
-            TILE_SIZE,
-            TILE_SIZE
-        )
-    )
-    tokens[kind] = sprite
-    col += TILE_SIZE
-
-def check_left_top(grid, i, j, size):
-
-    if(i > 0 and grid[i-1][j] == size):
-        return True
-    if(j > 0 and grid[i][j-1] == size):
-        return True
-    
-def check_right(grid, i, j, size):
-    if(j < 10 - 1 and grid[i][j+1] == size):
-        return True
-    
-def draw_grid(window, grid):
-    for i in range(10):
-        for j in range(10):
-            size = grid[i][j]
-            
-            if size == 0 or check_left_top(grid, i, j, size):
-                continue
-
-            if check_right(grid, i, j, size):
-                window.blit(horizontal_ships[size], (OCEAN_GRID_X + j*TILE_SIZE - j,
-                                                     OCEAN_GRID_Y + i*TILE_SIZE - i))
-            else:
-                window.blit(vertical_ships[size], (OCEAN_GRID_X + j*TILE_SIZE - j,
-                                                     OCEAN_GRID_Y + i*TILE_SIZE - i))
-                
-def draw_radar_mask(window, mask):
-    for i in range(10):
-        for j in range(10):
-            kind = mask[i][j]
-
-            if kind == 1:
-                window.blit(tokens['radar_ship'], (RADAR_GRID_X + j*TILE_SIZE - j,
-                                                     OCEAN_GRID_Y + i*TILE_SIZE - i))
-            elif kind == -1:
-                window.blit(tokens['radar_water'], (RADAR_GRID_X + j*TILE_SIZE - j,
-                                                     OCEAN_GRID_Y + i*TILE_SIZE - i))
-
-def draw_ocean_mask(window, mask):
-    for i in range(10):
-        for j in range(10):
-            kind = mask[i][j]
-
-            if kind == 1:
-                window.blit(tokens['ocean_ship'], (OCEAN_GRID_X + j*TILE_SIZE - j,
-                                                     OCEAN_GRID_Y + i*TILE_SIZE - i))
-            elif kind == -1:
-                window.blit(tokens['ocean_water'], (OCEAN_GRID_X + j*TILE_SIZE - j,
-                                                     OCEAN_GRID_Y + i*TILE_SIZE - i))
-
 
 def redrawWindow(win, game, p):
-    win.fill((0,0,50))
+    win.fill((0,0,0))
 
     if not(game.connected()):
-        font = pygame.font.SysFont("comicsans", 80)
-        text = font.render("Waiting for Player...", 1, (255,0,0), True)
+        animation_time = int(time.time() * 2)
+        dots_count = (animation_time % 4)
+        dots = '.' * dots_count
+
+        font = pygame.font.SysFont("assets/font.ttf", 28)
+        text = font.render("WAITING FOR PLAYER" + dots, 1, (255,255,255), True)
         win.blit(text, (WINDOW_WIDTH/2 - text.get_width()/2, WINDOW_HEIGHT/2 - text.get_height()/2))
     else:
         win.blit(radar_map, (12,54))
@@ -121,10 +29,23 @@ def redrawWindow(win, game, p):
 
         draw_grid(win, game.players[p].grid)
 
+        font = pygame.font.SysFont("assets/font.ttf", 20)
+
         if game.current_player_id == p:
-            font = pygame.font.SysFont("comicsans", 60)
-            text = font.render("Your Round", 1, (0, 255,255))
-            win.blit(text, (200, 10))
+            info_text = f"YOUR TURN. YOU HAVE {30 - game.shoot_count} SHOOTS!"
+        else:
+            info_text = f"PREPARE FOR THE OPPONENT'S SHOOTS"
+        
+        text = font.render(info_text, 1, (255, 255,255))
+        text_rect = text.get_rect()
+        text_rect.center = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 12)
+        win.blit(text, text_rect)
+
+        round_text = font.render(f"ROUND {game.battle_count}", 1, (255,255,255))
+        round_text_rect = round_text.get_rect()
+        round_text_rect.center = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 20)
+        win.blit(round_text, round_text_rect)
+
 
         draw_ocean_mask(win, game.players[p].mask)
         draw_radar_mask(win, game.players[1 - p].mask)
@@ -148,6 +69,32 @@ def main():
             print("Couldn't get game")
             break
 
+        if game.connected() and game.winner() != -1:
+
+            redrawWindow(win, game, player)
+            pygame.time.delay(500)
+
+            font = pygame.font.SysFont("assets/font.ttf", 70)
+            if (game.winner() == 1 and player == 1) or (game.winner() == 0 and player == 0):
+                text = font.render("YOU WON!", 1, (255, 255, 255))
+            else:
+                text = font.render("YOU LOST...", 1, (255, 255, 255))
+
+            text_rect = text.get_rect()
+            text_rect.center = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
+            pygame.draw.rect(win, (0,0,0), (0, WINDOW_HEIGHT // 2 - 40, WINDOW_WIDTH, 80))
+
+            win.blit(text, text_rect)
+            pygame.display.update()
+            
+            try:
+                game = n.send("reset")
+            except:
+                run = False
+                print("Couldn't get game")
+                break
+            pygame.time.delay(3000)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -165,26 +112,41 @@ def main():
 
         redrawWindow(win, game, player)
 
+
 def menu_screen():
     run = True
     clock = pygame.time.Clock()
 
+    blinking_counter = 0
+
     while run:
         clock.tick(60)
         win.fill((0,0,50))
-        font = pygame.font.SysFont("comicsans", 60)
-        text = font.render("Click to Play!", 1, (255,0,0))
-        win.blit(text, (100,200))
+        win.blit(titleScreen, (0,0))
+
+        font = pygame.font.Font("assets/font.ttf", 18)
+        text = font.render("PRESS SPACE TO PLAY", 1, (255,255,255))
+        text_rect = text.get_rect()
+        text_rect.center = (WINDOW_WIDTH // 2, 3 * (WINDOW_HEIGHT) // 4)
+
+        if blinking_counter % 60 < 20:
+            win.blit(text, text_rect)
+        
+        blinking_counter += 1
         pygame.display.update()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 run = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                run = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    gameSounds['play'].set_volume(0.05)
+                    gameSounds['play'].play()
+                    run = False
 
     main()
 
-while True:
-    menu_screen()
+if __name__ == '__main__':
+    while True:
+        menu_screen()

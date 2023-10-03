@@ -1,16 +1,13 @@
 import socket
 from _thread import *
 import pickle
-import random 
 from components import *
-
-server = "localhost"
-port = 1234
+from constants import ADDRESS, PORT
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 try:
-    s.bind((server, port))
+    s.bind((ADDRESS, PORT))
 except socket.error as e:
     str(e)
 
@@ -25,7 +22,6 @@ def threaded_client(conn, p, gameId):
     global idCount
     conn.send(str.encode(str(p)))
 
-    reply = ""
     while True:
         try:
             data = conn.recv(4096).decode()
@@ -36,14 +32,11 @@ def threaded_client(conn, p, gameId):
                 if not data:
                     break
                 else:
-                    #if data == "reset":
-                    #    print("oi")
-                    if data != "get":
-                        print(f"different data: {data}")
+                    if data == "reset":
+                        game.reset()
+                    elif data != "get":
                         game.shoot(p, data)
-                        print(f"atirei")
 
-                    print(game)
                     conn.sendall(pickle.dumps(game))
             else:
                 break
@@ -53,7 +46,7 @@ def threaded_client(conn, p, gameId):
     print("Lost connection")
     try:
         del games[gameId]
-        print("Closing Game", gameId)
+        print("Closing Game...", gameId)
     except:
         pass
     idCount -= 1
