@@ -15,8 +15,8 @@ Python 3.x installed. You can download it from [python.org](python.org).
 Clone the repository to your local machine:
 
 ```shell
-git clone https://github.com/ThiagoORuby/Naval-Battle-Pygame.git
-cd Naval-Battle-Pygame
+git clone https://github.com/ThiagoORuby/Network-Battleship-Pygame.git
+cd Network-Battleship-Pygame
 ```
 
 Create a virtual environment and activate it:
