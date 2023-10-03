@@ -6,12 +6,12 @@ from utils import *
 from math import floor
 import time
 
-
+# Initialize Pygame
 pygame.init()
 win = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("Client")
 
-
+# Redraw Game Window
 def redrawWindow(win, game, p):
     win.fill((0,0,0))
 
@@ -32,7 +32,7 @@ def redrawWindow(win, game, p):
         font = pygame.font.SysFont("assets/font.ttf", 20)
 
         if game.current_player_id == p:
-            info_text = f"YOUR TURN. YOU HAVE {30 - game.shoot_count} SHOOTS!"
+            info_text = f"YOUR TURN. YOU HAVE {NUM_SHOOTS - game.shoot_count} SHOOTS!"
         else:
             info_text = f"PREPARE FOR THE OPPONENT'S SHOOTS"
         
@@ -41,7 +41,7 @@ def redrawWindow(win, game, p):
         text_rect.center = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 12)
         win.blit(text, text_rect)
 
-        round_text = font.render(f"ROUND {game.battle_count}", 1, (255,255,255))
+        round_text = font.render(f"ROUND {(game.battle_count) // 2}", 1, (255,255,255))
         round_text_rect = round_text.get_rect()
         round_text_rect.center = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 20)
         win.blit(round_text, round_text_rect)
@@ -52,7 +52,7 @@ def redrawWindow(win, game, p):
 
     pygame.display.update()
 
-
+# Load the Main Game Screen
 def main():
     run = True
     clock = pygame.time.Clock()
@@ -113,6 +113,7 @@ def main():
         redrawWindow(win, game, player)
 
 
+# Load the Menu Screen
 def menu_screen():
     run = True
     clock = pygame.time.Clock()

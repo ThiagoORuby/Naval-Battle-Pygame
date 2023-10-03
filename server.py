@@ -4,6 +4,7 @@ import pickle
 from components import *
 from constants import ADDRESS, PORT
 
+# initiliaze the server socket
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 try:
@@ -14,10 +15,10 @@ except socket.error as e:
 s.listen()
 print("Waiting for a connection, Server Started")
 
-games = {}
-idCount = 0
+games = {} # list of Game instances
+idCount = 0 # num of lcinets connected
 
-
+# Start a thread for a client
 def threaded_client(conn, p, gameId):
     global idCount
     conn.send(str.encode(str(p)))
@@ -61,6 +62,7 @@ while True:
     idCount += 1
     p = 0
     gameId = (idCount - 1)//2
+
     if idCount % 2 == 1:
         games[gameId] = Game(gameId)
         games[gameId].players[p] = Player()

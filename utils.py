@@ -1,50 +1,59 @@
 from constants import *
 import random
 
-def generate_grid():
-    num_linhas = 10
-    num_colunas = 10
-    matriz = [[0] * num_colunas for _ in range(num_linhas)]
-
-    barcos = [(5, 1), (4, 2), (3, 2), (2, 3)]
-    barcos.sort(reverse=True)
-
-    for tamanho, quantidade in barcos:
-        for _ in range(quantidade):
-            while True:
-                direcao = random.choice(["horizontal", "vertical"])
-                x = random.randint(0, num_linhas - 1)
-                y = random.randint(0, num_colunas - 1)
-
-                space_okay = True
-                position_okay = True
-
-                for i in range(tamanho):
-                    if direcao == "horizontal":
-                        if y + i > num_colunas - 1 or matriz[x][y + i] != 0:
-                            position_okay = False
-                            break
-                    else:
-                        if x + i > num_linhas - 1 or matriz[x + i][y] != 0:
-                            position_okay = False
-                            break
-                    for j in range(-1, 2):
-                        for k in range(-1, 2):
-                            if 0 <= x + i + j < num_linhas and 0 <= y + i + k < num_colunas:
-                                if matriz[x + i + j][y + i + k] != 0:
-                                    space_okay = False
-                                    break
-                
-                if position_okay and space_okay:
-                    for i in range(tamanho):
-                        if direcao == "horizontal":
-                            matriz[x][y + i] = tamanho
-                        else:
-                            matriz[x + i][y] = tamanho
-                    break
-                
+# Create a new ship on a grid
+def createShip(size, grid):
+    while True:
+        i = random.randint(0, 9)
+        j = random.randint(0, 9)
+        direction = random.choice(["horizontal", "vertical"])
+        
+        if direction == "horizontal":
+            finalI = i
+            finalJ = j + size - 1
+            if finalJ > 9:
                 continue
-    return matriz
+        else:
+            finalI = i + size - 1
+            finalJ = j
+            if finalI > 9:
+                continue
+        
+        collision = False
+        for x in range(i, finalI + 1):
+            for y in range(j, finalJ + 1):
+                if grid[x][y] > 0:
+                    collision = True
+                    break
+            if collision:
+                break
+        
+        if not collision and not adjacentShip(grid, i, j, finalI, finalJ):
+            for x in range(i, finalI + 1):
+                for y in range(j, finalJ + 1):
+                    grid[x][y] = size
+            break
+
+# check if has an adjacent ship
+def adjacentShip(grid, i, j, finalI, finalJ):
+    for x in range(i - 1, finalI + 2):
+        for y in range(j - 1, finalJ + 2):
+            if 0 <= x < 10 and 0 <= y < 10 and grid[x][y] > 0:
+                return True
+    return False
+
+# Generate a Battleship Grid
+def generate_grid():
+    grid = [[0] * 10 for _ in range(10)]
+
+    ships = [(5, 1), (4, 2), (3, 2), (2, 3)]
+
+    for size, qnt in ships:
+        for _ in range(qnt):
+            createShip(size, grid)
+    
+    return grid
+
 
 def check_left_top(grid, i, j, size):
 
@@ -57,6 +66,7 @@ def check_right(grid, i, j, size):
     if(j < 10 - 1 and grid[i][j+1] == size):
         return True
     
+# Draw the Grid on the screen
 def draw_grid(window, grid):
     for i in range(10):
         for j in range(10):
@@ -71,7 +81,8 @@ def draw_grid(window, grid):
             else:
                 window.blit(vertical_ships[size], (OCEAN_GRID_X + j*TILE_SIZE - j,
                                                      OCEAN_GRID_Y + i*TILE_SIZE - i))
-                
+
+# Draw the radar mask    
 def draw_radar_mask(window, mask):
     for i in range(10):
         for j in range(10):
@@ -84,6 +95,7 @@ def draw_radar_mask(window, mask):
                 window.blit(tokens['radar_water'], (RADAR_GRID_X + j*TILE_SIZE - j,
                                                      OCEAN_GRID_Y + i*TILE_SIZE - i))
 
+# Draw the ocean mask
 def draw_ocean_mask(window, mask):
     for i in range(10):
         for j in range(10):

@@ -18,6 +18,7 @@ OCEAN_GRID_Y = 85
 RADAR_GRID_X = 43
 RADAR_GRID_POS = (RADAR_GRID_X, OCEAN_GRID_Y)
 
+NUM_SHOOTS = 3
 
 ADDRESS = 'localhost'
 PORT = 1234
@@ -37,6 +38,7 @@ gameSounds = {
     'water_shoot' : pygame.mixer.Sound('assets/splash.wav')
 }
 
+# Load the sprites from the spritesheets
 row = 0
 col = 0
 h_row = SHIP_POS_Y

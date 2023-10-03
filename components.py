@@ -1,16 +1,20 @@
 from constants import *
 from utils import generate_grid
 
-def check_winner(grid, mask):
+# Check if a player lost the game
+def check_loser(player):
     for i in range(10):
         for j in range(10):
-            if grid[i][j] != 0:
-                if grid[i][j] + mask[i][j] == grid[i][j]:
+            if player.grid[i][j] != 0:
+                if player.grid[i][j] + player.mask[i][j] == player.grid[i][j]:
                     return False
                 
     return True
 
 class Player:
+
+    """Class that represents a Player
+    """
     
     def __init__(self):
         self.grid = []
@@ -18,13 +22,21 @@ class Player:
         self.init_grid_and_mask()
 
     def init_grid_and_mask(self):
+        """Create a new random grid and reset the mask
+        """
         
         self.grid = generate_grid()
         self.mask = [[0 for _ in range(10)] for _ in range(10)]
 
 class Game:
+
     
     def __init__(self, id):
+        """Class that represents a Game
+
+        Args:
+            id (int): The Game Session id
+        """
         self.id = id
         self.ready = False
         self.battle_count = 0
@@ -34,15 +46,23 @@ class Game:
         self.current_player_id = None
 
     def connected(self):
-        return self.ready
+        """Check if the game's ready
 
-    def get_player_shoot(self, player):
-        return self.shoots[player]
+        Returns:
+            bool: Ready status
+        """
+        return self.ready
     
-    def shoot(self, player, pos):
-        self.shoots[player] = pos
+    def shoot(self, player_id, pos):
+        """Execute a shoot from a player
+
+        Args:
+            player_id (int): Id of the player
+            pos (List(int)): Grid position
+        """
+        self.shoots[player_id] = pos
         self.shoot_count+=1
-        player2 = self.players[1 - player]
+        player2 = self.players[1 - player_id]
         col, row = [int(val) for val in pos.split(',')]
 
         if not player2.mask[row][col]:
@@ -56,16 +76,21 @@ class Game:
                 gameSounds['water_shoot'].stop()
                 gameSounds['water_shoot'].set_volume(0.04)
                 gameSounds['water_shoot'].play()
-        if self.shoot_count == 30:
+        if self.shoot_count == NUM_SHOOTS:
             self.update_current_player()
             self.shoot_count = 0
 
     def winner(self):
+        """Returns the winner player id
+
+        Returns:
+            int: winner player id or -1
+        """
         player1 = self.players[0]
         player2 = self.players[1]
 
-        p1_winner = check_winner(player2.grid, player2.mask)
-        p2_winner = check_winner(player1.grid, player1.mask)
+        p1_winner = check_loser(player2)
+        p2_winner = check_loser(player1)
 
         if p1_winner:
             return 0
@@ -77,6 +102,8 @@ class Game:
         return -1
     
     def reset(self):
+        """Reset the game session
+        """
         self.shoots = [None, None]
         self.shoot_count = 0
         self.battle_count += 1
@@ -89,4 +116,6 @@ class Game:
         return f"Game(id:{self.id}, ready: {self.ready})"
 
     def update_current_player(self):
+        """Update the current player
+        """
         self.current_player_id = int(not self.current_player_id)
