@@ -1,5 +1,12 @@
 # Multiplayer Naval Battle Game
 
+<table>
+  <tr>
+    <td><img src="src/menuscreen.png"></td>
+    <td><img src="src/playscreen.png"></td>
+  </tr>
+</table>
+
 A Naval Battle Game made with python, using pygame and socket.
 
 ---
@@ -48,6 +55,10 @@ python client.py
 
 Follow the on-screen instructions to start playing.
 
+![](src/game.gif)
+
+- **Red Token:** shot on a ship
+- **Gren Token:** shot in the water
 
 ### License
 This project is licensed under the MIT License - see the LICENSE file for details.

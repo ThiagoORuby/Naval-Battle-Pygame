@@ -2,7 +2,7 @@ import socket
 from _thread import *
 import pickle
 from components import *
-from constants import ADDRESS, PORT
+from constants import ADDRESS, PORT, MAX_CLIENTS
 
 # initiliaze the server socket
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -12,7 +12,7 @@ try:
 except socket.error as e:
     str(e)
 
-s.listen()
+s.listen(MAX_CLIENTS)
 print("Waiting for a connection, Server Started")
 
 games = {} # list of Game instances
@@ -38,7 +38,7 @@ def threaded_client(conn, p, gameId):
                     elif data != "get":
                         game.shoot(p, data)
 
-                    conn.sendall(pickle.dumps(game))
+                    conn.send(pickle.dumps(game))
             else:
                 break
         except:

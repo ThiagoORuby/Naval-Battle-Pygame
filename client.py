@@ -33,10 +33,12 @@ def redrawWindow(win, game, p):
 
         if game.current_player_id == p:
             info_text = f"YOUR TURN. YOU HAVE {NUM_SHOOTS - game.shoot_count} SHOOTS!"
+            color = RED
         else:
             info_text = f"PREPARE FOR THE OPPONENT'S SHOOTS"
+            color = YELLOW
         
-        text = font.render(info_text, 1, (255, 255,255))
+        text = font.render(info_text, 1, color)
         text_rect = text.get_rect()
         text_rect.center = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 12)
         win.blit(text, text_rect)
@@ -46,6 +48,14 @@ def redrawWindow(win, game, p):
         round_text_rect.center = (WINDOW_WIDTH // 2, WINDOW_HEIGHT // 20)
         win.blit(round_text, round_text_rect)
 
+        grids_info = [(RADAR_GRID_X - 31, "OPPONENT'S GRID", GREEN),
+                       (OCEAN_GRID_X - 31, "YOUR GRID", BLUE)]
+
+        for info in grids_info:
+            grid_text = font.render(info[1], 1, info[2])
+            grid_text_rect = grid_text.get_rect()
+            grid_text_rect.center = (info[0] + GRID_WIDTH//2, WINDOW_HEIGHT - 40)
+            win.blit(grid_text, grid_text_rect)
 
         draw_ocean_mask(win, game.players[p].mask)
         draw_radar_mask(win, game.players[1 - p].mask)
